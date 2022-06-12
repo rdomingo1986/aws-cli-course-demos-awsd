@@ -19,3 +19,7 @@ publicIp=$(aws ec2 describe-instances --instance-ids $instanceId --query "Reserv
 aws ec2 terminate-instances --instance-ids $instanceId
 
 aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output table
+
+aws ec2 delete-key-pair --key-name $keyName
+
+aws ec2 delete-security-group --group-id $sgId
