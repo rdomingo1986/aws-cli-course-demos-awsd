@@ -1,0 +1,17 @@
+sgId=$(aws ec2 create-security-group --group-name devonaws-sg --description "Developing on AWS Course SG" --query "GroupId" --output text)
+
+aws ec2 authorize-security-group-ingress --group-id $sgId --protocol tcp --port 22 --cidr 0.0.0.0/0
+
+keyName=devonaws-keypair
+
+aws ec2 create-key-pair --key-name $keyName --query "KeyMaterial" --output text > keypair.pem
+
+chmod 400 keypair.pem
+
+imageId=$(aws ec2 describe-images --owners amazon --filters "Name=name,Values=amzn2-ami-kernel*" --query 'reverse(sort_by(Images, &CreationDate))[0].ImageId' --output text)
+
+instanceId=$(aws ec2 run-instances --image-id $imageId --key-name $keyName --security-group-ids $sgId --instance-type t2.micro --count 1 --query "Instances[0].InstanceId" --output text)
+
+aws ec2 wait instance-running --instance-ids $instanceId
+
+publicIp=$(aws ec2 describe-instances --instance-ids $instanceId --query "Reservations[0].Instances[0].[PublicIpAddress]" --output text)
