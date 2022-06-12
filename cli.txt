@@ -15,3 +15,7 @@ instanceId=$(aws ec2 run-instances --image-id $imageId --key-name $keyName --sec
 aws ec2 wait instance-running --instance-ids $instanceId
 
 publicIp=$(aws ec2 describe-instances --instance-ids $instanceId --query "Reservations[0].Instances[0].[PublicIpAddress]" --output text)
+
+aws ec2 terminate-instances --instance-ids $instanceId
+
+aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output table
